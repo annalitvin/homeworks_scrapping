@@ -43,20 +43,20 @@ def get_news(num_article: int = 5):
 
     soup = BeautifulSoup(content, "lxml")
 
-    article_data = []
+    articles_data = []
 
     articles = soup.find_all("div", {"data-testid": "promo", "type": "article"})
     article_count = 0
     for article in articles:
-        article_count += 1
         url_element = article.find("a")
         if url_element.parent.has_attr("spacing"):
             url = urljoin(BBC_NEWS_DOMEN, article.find("a").get("href"))
             related_topics = get_related_topics(url)
-            article_data.append(dict(Link=url, Topics=related_topics))
+            articles_data.append(dict(Link=url, Topics=related_topics))
+            article_count += 1
         if article_count == num_article:
             break
-    return article_data
+    return articles_data
 
 
 def get_related_topics(article_url):
