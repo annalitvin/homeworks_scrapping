@@ -15,9 +15,6 @@ USER_AGENTS = [
 BBC_NEWS_URL = "https://www.bbc.com/sport"
 BBC_NEWS_DOMEN = "https://www.bbc.com"
 
-NEWS_GRID_CLASS = "ssrcss-1xxqo5f-Grid e12imr580"
-ARTICLE_CONTENT_CLASS = "ssrcss-tq7xfh-PromoContent exn3ah99"
-
 
 def save_to_json(data, file_name: str):
     with open(file_name, "w") as f:
@@ -48,19 +45,17 @@ def get_news(num_article: int = 5):
 
     article_data = []
 
-    grid = soup.find("ul", class_=NEWS_GRID_CLASS)
-    news_blocks = grid.contents
+    articles = soup.find_all("div", {"data-testid": "promo", "type": "article"})
     article_count = 0
-    for block in news_blocks:
-        article = block.find("div", {"type": "article"})
-        if article:
-            article_count += 1
-            article_content = article.find("div", class_=ARTICLE_CONTENT_CLASS)
-            url = urljoin(BBC_NEWS_DOMEN, article_content.find("a").get("href"))
+    for article in articles:
+        article_count += 1
+        url_element = article.find("a")
+        if url_element.parent.has_attr("spacing"):
+            url = urljoin(BBC_NEWS_DOMEN, article.find("a").get("href"))
             related_topics = get_related_topics(url)
             article_data.append(dict(Link=url, Topics=related_topics))
-            if article_count == num_article:
-                break
+        if article_count == num_article:
+            break
     return article_data
 
 
