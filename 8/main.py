@@ -23,10 +23,8 @@ def save_to_json(data, file_name: str):
         json.dump(data, f, indent=4)
 
 
-def get_jobs():
+def get_jobs(what: str, where: str, max_page: int = 3):
     driver = webdriver.Chrome(options=OPTIONS)
-
-    max_page = 3
 
     job_results = []
 
@@ -35,10 +33,10 @@ def get_jobs():
     wait.until(EC.presence_of_element_located((By.ID, "jobsearch")))
     input_what = driver.find_element(By.ID, "text-input-what")
     wait = WebDriverWait(driver, 10)
-    wait.until(lambda d: input_what.send_keys("home office") or True)
+    wait.until(lambda d: input_what.send_keys(what) or True)
     input_where = driver.find_element(By.ID, "text-input-where")
     wait = WebDriverWait(driver, 10)
-    wait.until(lambda d: input_where.send_keys("Campinas, SP") or True)
+    wait.until(lambda d: input_where.send_keys(where) or True)
     submit_button = driver.find_element(
         By.CLASS_NAME, "yosegi-InlineWhatWhere-primaryButton"
     )
@@ -72,5 +70,5 @@ def get_jobs():
 
 
 if __name__ == "__main__":
-    jobs = get_jobs()
+    jobs = get_jobs(what="home office", where="Campinas, SP")
     save_to_json(jobs, "job_results.json")
