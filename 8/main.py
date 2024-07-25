@@ -1,10 +1,13 @@
 import json
+import time
+import random
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
 
 JOB_SEARCH_URL = "https://br.indeed.com/?from=jobsearch-empty-whatwhere"
 
@@ -48,7 +51,12 @@ def get_jobs():
         if page == 1:
             page_url_xpath = "//a[@data-testid='pagination-page-current']"
 
-        page_url = driver.find_element(By.XPATH, page_url_xpath).get_attribute("href")
+        try:
+            page_url = driver.find_element(By.XPATH, page_url_xpath).get_attribute("href")
+        except NoSuchElementException:
+            raise ValueError(f"{page} page doesn't exist!")
+        # get around Forbidden exception
+        time.sleep(random.randint(3, 6))
         driver.get(page_url)
         wait = WebDriverWait(driver, 10)
         wait.until(EC.presence_of_element_located((By.CLASS_NAME, "jcs-JobTitle")))
